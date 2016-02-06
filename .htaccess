@@ -1,0 +1,20 @@
+# Устанавливаем язык по умолчанию русский utf-8 или Windows-1251
+AddDefaultCharset utf-8
+
+# Запрет на доступ к файлам каталога при отсутствии индексного файла index.php
+#options None
+
+# Включаем mod_rewrite
+#RewriteEngine on
+# Перенаправляем все запросы в индексный файл index.php
+#RewriteRule .* index.php
+
+#RewriteCond %{REQUEST_FILENAME} -s [OR]
+#RewriteCond %{REQUEST_FILENAME} -l [OR]
+#RewriteCond %{REQUEST_FILENAME} -d
+#RewriteRule ^.*$ - [NC,L]
+#RewriteRule ^.*$ index.php [NC,L]
+
+# Для большей безопасности отключаем следующие параметры
+#php_flag magic_quotes_gpc off
+#php_flag register_globals off

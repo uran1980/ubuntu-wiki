@@ -1,0 +1,508 @@
+﻿/***
+!Основной способ
+''Установить ~TiddlyWiki''
+# Cкачать файл ~TiddlyWiki с [[официального сайта|http://www.tiddlywiki.com/ ]] (обратите внимание -- чтобы все работало, нужно скачивать файл, щелкнув правой клавишей мыши по ссылка (на Маке -- Ctrl+мышь) и выбрать из появившегося меню "save target as"
+# Открыть файл в совместимом браузере (Explorer я не пробовал, и вам не советую. Firefox, Opera, Safari (последние выпуски), Camino)
+# Убедится, что все работает, изменения сохраняются и пр.
+''Собственно, русифицировать''
+# Нажать ссылку "options" в правом меню.
+# В выехавшей панели нажать ~ImportTiddlers
+# В панели импорта ввести в верхнее поле адрес http://glebsite.ru/tw/
+# Нажать ''fetch''
+# Через какое-то время вы увидите список всех записей моей инсталляции. Выбитайте из списка RuStyle, поставив напротив нее галку, жмите кнопку, дождитесь сообщения об удачной загрузке.
+# Сохраните изменения и перезагрузите wiki (Shift+reload)
+# Интерфейс русифицировался!
+# Теперь можно импортировать записи из вашего старого файла, если он у вас был.
+
+! Альтернативный способ
+(предполагаю, что ~TiddlyWiki вы уже скачали, и прочли про [[основной способ|Как руссифицировать интерфейс]])
+# Выделите и скопируйте в буфер обмена весь текст приведенный ниже в желтом поле
+# Создайте новую запись (new Tiddler) в //своей инсталляции ~TiddlyWiki//
+#  Перейдите в режим редактирования, и вставьте в нее ранее скопированное.
+# Назовите запись ~RuStyle, добавьте метку (tag) systemConfig
+# Сохраните запись, сохраните изменения, перезагрузите ~TiddlyWiki
+Все!!! Теперь ваш интерфейс руссифицирован.
+
+|''Name:''|RuStyle|
+|''Description:''|TW russianization|
+|''Version:''|0.6.0|
+|''Date:''|2006|
+|''Source:''|http://www.glebsite.ru|
+|''Author:''|Глеб Тржемецкий (Gleb Trzhemetski)|
+|''License:''|BSD open source license|
+|''CoreVersion:''|2.1.0|
+|''Browser:''|Firefox 1.0.4+; Firefox 1.5; InternetExplorer 6.0|
+***/
+
+/*{{{*/
+merge(config.messages,{
+	customConfigError: "Возникли проблемы при загрузке плагинов. См. PluginManager ",
+	pluginError: "Ошибка: %0",
+	pluginDisabled: "Не задействован, так как помечен 'systemConfigDisable' ",
+	pluginForced: "Задействован, так как помечен 'systemConfigForce' ",
+	pluginVersionError: "Не задействован из-за несоответствия версий",
+	nothingSelected: "Ничего не выбрано.",
+	savedSnapshotError: "Похоже, эта wiki была неправильно сохранена. См. http://www.tiddlywiki.com/#DownloadSoftware ",
+	subtitleUnknown: "(неизвестно)",
+	undefinedTiddlerToolTip: "Записи '%0' не существует",
+	shadowedTiddlerToolTip: "Запись '%0' заполнена по умолчанию.",
+	tiddlerLinkTooltip: "%0 - %1, %2",
+	externalLinkTooltip: "Ссылка: %0",
+	noTags: "Нет помеченных записей",
+	notFileUrlError: "Сохраните TiddlyWiki в файл, чтобы иметь возможность сохранять изменения ",
+	cantSaveError: "Сохранение невозможно. Либо ваш браузер не подерживает эту функцию (используйте по возможности FireFox), либо путь к файлу содержит недопустимые символы",
+	invalidFileError: "Файл '%0' не похож на файл TiddlyWiki",
+	backupSaved: "Резервная копия сохранена",
+	backupFailed: "Не получилось сохранить резервную копию",
+	rssSaved: "RSS сохранен",
+	rssFailed: "Не получилось сохранить RSS",
+	emptySaved: "Пустой шаблон сохранен",
+	emptyFailed: "Не получилось сохранить пустой шаблон",
+	mainSaved: "Файл TiddlyWiki сохранен",
+	mainFailed: "Не получилось сохранить файл TiddlyWiki. Изменения не сохранены",
+	macroError: "Ошибка в сценарии <<%0>>",
+	macroErrorDetails: "Ошибка при выполнении сценария  <<%0>>:\n%1",
+	missingMacro: "Нет такого сценария",
+	overwriteWarning: "Запись '%0' уже есть. Нажмите OK, чтобы перезаписать",
+	unsavedChangesWarning: "ВНИМАНИЕ! Есть несохраненные изменения! \n\nНажмите OK, чтобы сохранить\nНажмите CANCEL чтобы не сохранять",
+	confirmExit: "--------------------------------\n\nИзменения в TiddlyWiki не сохранены. Если вы продолжите, они потеряются.\n\n--------------------------------",
+	saveInstructions: "SaveChanges",
+	unsupportedTWFormat: "Неподдерживаемый TiddlyWiki формат '%0'",
+	tiddlerSaveError: "Ошибка при сохранении записи '%0'",
+	tiddlerLoadError: "Ошибка при открытии записи '%0'",
+	wrongSaveFormat: "Не получается сохранить в формате '%0'. Сохранено в стандартном формате.",
+	invalidFieldName: "Недопустимое имя поля %0",
+	fieldCannotBeChanged: "Поле '%0' нельзя изменять"});
+
+merge(config.messages.messageClose,{
+	text: "×",
+	tooltip: "скрыть сообщение"});
+
+config.messages.dates.months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября","декабря"];
+config.messages.dates.days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+config.messages.dates.shortMonths = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
+config.messages.dates.shortDays = ["Вс.", "Пн.", "Вт.", "Ср.", "Чт.", "Пт.", "Сб."];
+
+merge(config.views.wikified.tag,{
+	labelNoTags: "меток нет",
+	labelTags: "категории (метки): ",
+	openTag: "Открыть метку '%0'",
+	tooltip: "Показать записи, помеченные как '%0'",
+	openAllText: "Открыть все",
+	openAllTooltip: "Открыть все эти записи",
+	popupNone: "Нет других записей с меткой '%0'"});
+
+merge(config.views.wikified,{
+	defaultText: "Записи '%0' не существует. Создайте ее двойным щелчком.",
+	defaultModifier: "(?)",
+	shadowModifier: "(системная запись)",
+	createdPrompt: "создана: "});
+
+merge(config.views.editor,{
+	tagPrompt: "Введите метки, разделенные пробелами, [[используйте квадратные скобки]] если нужно, или выберите метки из списка.",
+	defaultText: "Здесь мог бы быть осмысленный текст на тему '%0'"});
+
+merge(config.views.editor.tagChooser,{
+	text: "метки",
+	tooltip: "Выберите метки из списка",
+	popupNone: "Меток пока нет",
+	tagTooltip: "Добавить метку '%0'"});
+
+merge(config.macros.search,{
+	label: "поиск",
+	prompt: "Поиск по всем записям",
+	accessKey: "F",
+	successMsg: "%0 записей, соответствующих критерию: %1",
+	failureMsg: "Не найдено записей по запросу: %0"});
+
+merge(config.macros.tagging,{
+	label: "связанные с этой записи: ",
+	labelNotTag: "нету",
+	tooltip: "Список записей, помеченных: '%0'"});
+
+merge(config.macros.timeline,{
+	dateFormat: "DD.mmm.YYYY"});
+
+merge(config.macros.allTags,{
+	tooltip: "Показать записи, помеченные '%0'",
+	noTags: "Нет таких записей"});
+
+config.macros.list.all.prompt = "Все записи по алфавиту";
+config.macros.list.missing.prompt = "Ненаписанные";
+config.macros.list.orphans.prompt = "Записи, на которые нет ссылок";
+config.macros.list.shadowed.prompt = "Системные записи";
+
+merge(config.macros.closeAll,{
+	label: "закрыть все",
+	prompt: "Закрыть все записи \(кроме редактируемых\)"});
+
+merge(config.macros.permaview,{
+	label: "ссылка",
+	prompt: "Постоянная ссылка"});
+
+merge(config.macros.saveChanges,{
+	label: "сохранить изменения",
+	prompt: "Сохранить всё",
+	accessKey: "S"});
+
+merge(config.macros.newTiddler,{
+	label: "новая запись",
+	prompt: "Создать новую запись",
+	title: "Новая запись",
+	accessKey: "N"});
+
+merge(config.macros.newJournal,{
+	label: "новая датированная запись",
+	prompt: "Создать запись, с названием, соответствующим текущей дате",
+	accessKey: "J"});
+
+merge(config.macros.plugins,{
+	skippedText: "(Этот плагин не запущен, так как был добавлен после запуска)",
+	noPluginText: "Плагинов нет",
+	confirmDeleteText: "Вы действительно хотите удалить записи:\n\n%0",
+/******************************************************** МОЕ ДОПОЛНЕНИЕ К ПЕРЕВОДУ **************************************************/
+        wizardTitle: "Управление дополнениями",
+	step1Title: "Загруженные дополнения",
+	removeLabel: "удалить системную метку",
+	removePrompt: "Удалить системную метку",
+	deleteLabel: "удалить",
+	deletePrompt: "Удалить эти записи окончательно",
+/******************************************************************************************************************************************************/
+	listViewTemplate : {
+		columns: [
+			{name: 'Selected', field: 'Selected', rowName: 'title', type: 'Selector'},
+			{name: 'Title', field: 'title', tiddlerLink: 'title', title: "Заголовок", type: 'TiddlerLink'},
+			{name: 'Forced', field: 'forced', title: "Принудительно", tag: 'systemConfigForce', type: 'TagCheckbox'},
+			{name: 'Disabled', field: 'disabled', title: "Отключено", tag: 'systemConfigDisable', type: 'TagCheckbox'},
+			{name: 'Executed', field: 'executed', title: "Загружено", type: 'Boolean', trueText: "Да", falseText: "Нет"},
+			{name: 'Error', field: 'error', title: "Статус", type: 'Boolean', trueText: "Ошибка", falseText: "OK"},
+			{name: 'Log', field: 'log', title: "Лог", type: 'StringList'}
+			],
+		rowClasses: [
+			{className: 'error', field: 'error'},
+			{className: 'warning', field: 'warning'}
+			],
+		actions: [
+			{caption: "Действия...", name: ''},
+			{caption: "Сделать не системной записью", name: 'remove'},
+			{caption: "Удалить из wiki", name: 'delete'}
+			]}
+	});
+
+merge(config.macros.refreshDisplay,{
+	label: "обновить",
+	prompt: "Обновить отображение"
+	});
+
+merge(config.macros.importTiddlers,{
+	defaultPath: "http://www.tiddlywiki.com/index.html",
+	fetchLabel: "загрузить",
+	fetchPrompt: "Загрузить файл TiddlyWiki",
+	fetchError: "Ошибка при загрузке файла",
+	confirmOverwriteText: "Вы уверены, что хотите перезаписать следующие записи:\n\n%0",
+	wizardTitle: "Импорт записей из файла TiddlyWiki",
+	step1: "Шаг 1: Введите путь к файлу",
+	step1prompt: "Введите URL или путь к локальному файлу: ",
+	step1promptFile: "...или выберите тут: ",
+	step1promptFeeds: "...или из предустановленных: ",
+	step1feedPrompt: "Выберите...",
+	step2: "Шаг 2: Загрузка файла",
+	step2Text: "Дождитесь окончания загрузки: %0",
+	step3: "Шаг 3: Выберите записи для импорта:",
+	step4: "%0 записей импортировано",
+	step5: "Готово!",
+	listViewTemplate: {
+		columns: [
+			{name: 'Selected', field: 'Selected', rowName: 'title', type: 'Selector'},
+			{name: 'Title', field: 'title', title: "Title", type: 'String'},
+			{name: 'Snippet', field: 'text', title: "Snippet", type: 'String'},
+			{name: 'Tags', field: 'tags', title: "Tags", type: 'Tags'}
+			],
+		rowClasses: [
+			],
+		actions: [
+			{caption: "Действия...", name: ''},
+			{caption: "Импортировать", name: 'import'}
+			]}
+	});
+
+merge(config.commands.closeTiddler,{
+	text: "закрыть",
+	tooltip: "Закрыть эту статью"});
+
+merge(config.commands.closeOthers,{
+	text: "закрыть остальные",
+	tooltip: "Закрыть все записи, кроме этой"});
+
+merge(config.commands.editTiddler,{
+	text: "редактировать",
+	tooltip: "Редактировать запись",
+	readOnlyText: "исходный код",
+	readOnlyTooltip: "Просмотреть исходный код записи"});
+
+merge(config.commands.saveTiddler,{
+	text: "готово",
+	tooltip: "Сохранить изменения"});
+
+merge(config.commands.cancelTiddler,{
+	text: "отменить",
+	tooltip: "Отменить изменения",
+	warning: "Вы уверены, что не хотите сохранить запись '%0'?",
+	readOnlyText: "обычный вид",
+	readOnlyTooltip: "Вернуться к обычному просмотру"});
+
+merge(config.commands.deleteTiddler,{
+	text: "удалить",
+	tooltip: "Удалить запись",
+	warning: "Вы действительно хотите удалить '%0'?"});
+
+merge(config.commands.permalink,{
+	text: "ссылка",
+	tooltip: "Постоянная ссылка на эту запись"});
+
+merge(config.commands.references,{
+	text: "ссылки сюда",
+	tooltip: "Показать записи, ссылающиеся на эту",
+	popupNone: "Ссылок нет"});
+
+merge(config.commands.jump,{
+	text: "перейти к ...",
+	tooltip: "Перейти к другим открытым статьям"});
+
+merge(config.shadowTiddlers,{
+	DefaultTiddlers: "GettingStarted",
+	MainMenu: "GettingStarted",
+	SiteTitle: "~TiddlyWiki(ru)",
+	SiteSubtitle: "нелинейный гипертекстовый органайзер",
+	SiteUrl: "http://www.tiddlywiki.com/",
+	GettingStarted: "Для того, чтобы начать работать с TiddlyWiki, вы можете поменять следующие записи:\n* SiteTitle & SiteSubtitle: Заголовок и подзаголовок сайта (после сохранения вы увидите их в заголовке окна)\n* MainMenu: Меню (оно обычно слева)\n* DefaultTiddlers: Список записей, которые будут открыты при запуске wiki.\nИмя, которым будут подписаны ваши записи, можете ввести тут: <<option txtUserName>>",
+	SideBarOptions: "<<search>><<closeAll>><<permaview>><<newTiddler>><<newJournal 'DD MMM YYYY г.'>><<saveChanges>><<slider chkSliderOptionsPanel OptionsPanel 'установки »' 'Различные опции TidlyWiki'>>",
+	OptionsPanel: "Эти установки сохраняются в&nbsp\;Вашем браузере\n\nВаше имя для подписывания заметок. Лучше, если вы напишете его WotTak\n\n<<option txtUserName>>\n<<option chkSaveBackups>> Сохранять резервные копии\n<<option chkAutoSave>> Автосохранение\n<<option chkRegExpSearch>> Поиск с&nbsp\;регулярными выражениями\n<<option chkCaseSensitiveSearch>> Поиск чувствителен к&nbsp\;регистру?\n<<option chkAnimate>> Анимация\n\n----\n[[Дополнительно|AdvancedOptions]]\n[[Плагины|PluginManager]]\n[[Импорт записей|ImportTiddlers]]",
+	AdvancedOptions: "<<option chkGenerateAnRssFeed>> Публиковать RSS\n<<option chkOpenInNewWindow>>  Ссылки в новом окне\n<<option chkSaveEmptyTemplate>> Сохранять пустой шаблон\n<<option chkToggleLinks>> Щелчок по ссылке на открытую заметку закрывает ее\n^^(с Ctrl или другой функциональной клавишей не&nbsp\;будет срабатывать)^^\n<<option chkHttpReadOnly>> Не показывать инструменты редактирования через HTTP\n<<option chkForceMinorUpdate>> Не менять дату заметки при редактировании\n^^(для изменеия - жмите Shift при сохранеии, либо сохраняйте, нажимая Ctrl-Shift-Enter^^\n<<option chkConfirmDelete>> Подтверждать удаление\nМаксимум строк в&nbsp\;поле редактирования: <<option txtMaxEditRows>>\nСохранять бэкапы в&nbsp\;папке: <<option txtBackupFolder>>\n<<option chkInsertTabs>> При нажатии Tab вводить знак табуляции, а&nbsp\;не&nbsp\;переходить к&nbsp\;следующему элементу формы",
+	SideBarTabs: "<<tabs txtMainTab История История TabTimeline Все 'Все заметки' TabAll Метки 'Все метки' TabTags Ещё... 'Остальные списки' TabMore>>",
+	TabTimeline: "<<timeline>>",
+	TabAll: "<<list all>>",
+	TabTags: "<<allTags>>",
+	TabMore: "<<tabs txtMoreTab ЕщеНет 'Ненаписанные заметки' TabMoreMissing НетСсылок 'Забытые заметки' TabMoreOrphans Сист. 'Системные записи' TabMoreShadowed>>",
+	TabMoreMissing: "<<list missing>>",
+	TabMoreOrphans: "<<list orphans>>",
+	TabMoreShadowed: "<<list shadowed>>",
+	PluginManager: "<<plugins>>",
+	ImportTiddlers: "<<importTiddlers>>"});
+/*}}}*/
+
+/***
+!Мои дополнения к переводу для версии ~TiddlyWiki 2.4.3
+|Author: |Yakovlev Ivan Yak1980@list(dot)ru|
+|Date:|2009-02-20|
+***/
+/*{{{*/
+merge(config.macros.toolbar,{
+	moreLabel: "далее...",
+	morePrompt: "Раскрыть дополнительные команды"
+});
+
+merge(config.commands.fields,{
+	text: "поля",
+	tooltip: "Показать дополнительные поля для этой записи",
+	emptyText: "Нет дополнительных полей для этой записи",
+	listViewTemplate: {
+		columns: [
+			{name: 'Field', field: 'field', title: "Field", type: 'String'},
+			{name: 'Value', field: 'value', title: "Value", type: 'String'}
+			],
+		rowClasses: [
+			],
+		buttons: [
+]}});
+
+merge(config.commands.syncing,{
+	text: "синхр.",
+	tooltip: "Контроль синхронизации этой записи с сервером или внешним файлом",
+	currentlySyncing: "<div>Текущая синхронизация через <span class='popupHighlight'>'%0'</span> to:</"+"div><div>host: <span class='popupHighlight'>%1</span></"+"div><div>workspace: <span class='popupHighlight'>%2</span></"+"div>", // Note escaping of closing <div> tag
+	notCurrentlySyncing: "Синхронизация пока не задана",
+	captionUnSync: "Остановить синхронизацию этой записи",
+	chooseServer: "Синхронизовать эту запись с другим сервером:",
+	currServerMarker: "\u25cf ",
+	notCurrServerMarker: "  "});
+
+config.messages.backstage = {
+	open: {text: "доп. настр.", tooltip: "Открыть панель дополнительных настроек"},
+	close: {text: "закрыть", tooltip: "Закрыть панель дополнительных настроек"},
+	prompt: "доп. настройки: ",
+	decal: {
+		edit: {text: "редактировать", tooltip: "Редактировать запись '%0'"}
+	}
+};
+
+merge(config.tasks,{
+	save: {text: "сохранить", tooltip: "Сохранить изменения", action: saveChanges},
+	sync: {text: "синхр.", tooltip: "Синхронизовать изменения с другими файломи и серверами", content: '<<sync>>'},
+	importTask: {text: "импорт", tooltip: "Импортировать записи из других файлов или серверов", content: '<<importTiddlers>>'},
+	tweak: {text: "настройка", tooltip: "Настройка оформления и поведения движка", content: '<<options>>'},
+	upgrade: {text: "обновить", tooltip: "Обновить ядро движка", content: '<<upgrade>>'},
+	plugins: {text: "дополнения", tooltip: "Управление установленными дополнениями", content: '<<plugins>>'}
+});
+
+merge(config.macros.options,{
+	wizardTitle: "Дополнительная настройка",
+	step1Title: "Эти настройки сохраняются в файлах cookies вашего браузера",
+	step1Html: "<input type='hidden' name='markList'></input><br><input type='checkbox' checked='false' name='chkUnknown'>Show unknown options</input>",
+	unknownDescription: "//(unknown)//",
+	listViewTemplate: {
+		columns: [
+			{name: 'Option', field: 'option', title: "Option", type: 'String'},
+			{name: 'Description', field: 'description', title: "Description", type: 'WikiText'},
+			{name: 'Name', field: 'name', title: "Name", type: 'String'}
+			],
+		rowClasses: [
+			{className: 'lowlight', field: 'lowlight'}
+			]}
+});
+
+merge(config.macros.upgrade,{
+	wizardTitle: "Обновление ядра",
+	step1Title: "Обновление или исправление ядра движка до последней версии",
+	step1Html: "Вы пытаетесь обновить ядро движка до последней версии (с сайта <a href='%0' class='externalLink' target='_blank'>%1</a>). Все ваши данные будут сохранены в процессе обновления.<br><br>Помните, что новая версия ядра может конфликтовать с установленными устаревшими дополнениями. Если после обновления у вас возникнут проблемы, обратитесь за помощью по адресу: <a href='http://www.tiddlywiki.org/wiki/CoreUpgrades' class='externalLink' target='_blank'>http://www.tiddlywiki.org/wiki/CoreUpgrades</a>",
+	errorCantUpgrade: "Не возможно обновить ядро движка.Вы можете осуществлять обновления только на установленном локально файле",
+	errorNotSaved: "Вы должны сохранить изменения перед началом обновлениея",
+	step2Title: "Подтверждение деталей обновления",
+	step2Html_downgrade: "Вы пытаетесь откатится до версии %0 с версии %1.<br><br>Откат до более поздних версий не рекомендуется",
+	step2Html_restore: "Обновление не требуется. У вас и так новая версия (%0).<br><br>Вы можете продолжить обновление, чтобы быть уверенным, что ядро не повреждено",
+	step2Html_upgrade: "Вы пытаетесь обновится до версии %0 с версии %1",
+	upgradeLabel: "обновить",
+	upgradePrompt: "Подготовка к процессу обновления...",
+	statusPreparingBackup: "Подготовка архивной копии...",
+	statusSavingBackup: "Сохранить архивную копию",
+	errorSavingBackup: "Возникли проблемы при сохранении архивной копии",
+	statusLoadingCore: "Загрузка ядра...",
+	errorLoadingCore: "Ошибка загрузки ядра",
+	errorCoreFormat: "Произошла ошибка с новым ядром движка",
+	statusSavingCore: "Сохранить новое ядро",
+	statusReloadingCore: "Перезагрузить новое ядро",
+	startLabel: "старт",
+	startPrompt: "Начать процесс обновления",
+	cancelLabel: "отмена",
+	cancelPrompt: "Отменить процесс обновления",
+	step3Title: "Обновление отменено",
+	step3Html: "Вы отменили процесс обновления"
+});
+
+merge(config.macros.options,{
+	wizardTitle: "Дополнительные настройки",
+	step1Title: "Эти настройки сохраняются в файлах cookies вашего браузера. Если вы удалите эти файлы, то настройки будут сброшены",
+	step1Html: "<input type='hidden' name='markList'></input><br><input type='checkbox' checked='false' name='chkUnknown'>Показать неизвестные настройки</input>",
+	unknownDescription: "//(не известно)//",
+	listViewTemplate: {
+		columns: [
+			{name: 'Option', field: 'option', title: "Настройки", type: 'String'},
+			{name: 'Description', field: 'description', title: "Описание", type: 'WikiText'},
+			{name: 'Name', field: 'name', title: "Имя", type: 'String'}
+			],
+		rowClasses: [
+			{className: 'lowlight', field: 'lowlight'}
+			]}
+});
+
+// Options that can be set in the options panel and/or cookies
+merge(config.optionsDesc,{
+	txtUserName: "Имя пользователя для подписи к вашим записям",
+	chkRegExpSearch: "Разрешить регулярные выражения для поиска",
+	chkCaseSensitiveSearch: "Чувствительный к регистру поиск",
+	chkIncrementalSearch: "Инкрементный поиск шаг-за-шагом",
+	chkAnimate: "Разрешить анимацию",
+	chkSaveBackups: "Сохранять бэкап-файл при сохранении",
+	chkAutoSave: "Автосохранения",
+	chkGenerateAnRssFeed: "Генерировать ленту RSS при сохранении изменений",
+	chkSaveEmptyTemplate: "Генерировать пустой шаблон при сохранении изменений",
+	chkOpenInNewWindow: "Открывать внешние ссылки в новом окне",
+	chkToggleLinks: "Щелчек по ссылке на открытую запись приводит к ее закрытию",
+	chkHttpReadOnly: "Скрывать возможности редактирования при просмотре через протокол HTTP",
+	chkForceMinorUpdate: "Не обновлять имя пользователя и дату при редактировании записи",
+	chkConfirmDelete: "Требовать подтверждения при удалении записи",
+	chkInsertTabs: "Использовать клавишу Tab, чтобы вставить символ табуляции, а не переключаться на следующее поле",
+	txtBackupFolder: "Имя папки где хранятся резервные копии",
+	txtMaxEditRows: "Максимальное количество строк в поле редактирования",
+	txtFileSystemCharSet: "Кодировка по умолчанию для сохраняемых изменений (только для Firefox/Mozilla)"});
+
+merge(config.macros.importTiddlers,{
+	readOnlyWarning: "Вы не можете импортировать в помеченный только для чтения файл. Попробуйте открыть его через file:// URL",
+	wizardTitle: "Импорт записей из файла или сервера",
+	step1Title: "Шаг 1: Укажите путь к файлу или серверу",
+	step1Html: "Тип сервера: <select name='selTypes'><option value=''>Выбор...</option></select><br>Введите в поле ввода адрес URL или путь к файлу: <input type='text' size=50 name='txtPath'><br>...или используйте: <input type='file' size=50 name='txtBrowse'><br><hr>...или выберите заданный поток: <select name='selFeeds'><option value=''>Выбор...</option></select>",
+	openLabel: "открыть",
+	openPrompt: "Открыть соединение с файлом или сервером",
+	openError: "Возникли проблемы при получении файла",
+	statusOpenHost: "Открытие хоста",
+	statusGetWorkspaceList: "Получение списка доступных рабочих областей",
+	step2Title: "Шаг 2: Выберите рабочую область",
+	step2Html: "Введите имя рабочей области: <input type='text' size=50 name='txtWorkspace'><br>...или выберите рабочую область: <select name='selWorkspace'><option value=''>Выбор...</option></select>",
+	cancelLabel: "отмена",
+	cancelPrompt: "Отменит импорт",
+	statusOpenWorkspace: "Открытие рабочей области",
+	statusGetTiddlerList: "Получение списка доступных записей",
+	errorGettingTiddlerList: "Ошибка при получении списка записей, нажмите Отмена для повтора",
+	step3Title: "Шаг 3: Выберите записи для импорта",
+	step3Html: "<input type='hidden' name='markList'></input><br><input type='checkbox' checked='true' name='chkSync'>Связать эти записи с сервером для автоматической синхронизации изменений</input><br><input type='checkbox' name='chkSave'>Сохранить детали сервера в системной записи 'systemServer' :</input> <input type='text' size=25 name='txtSaveTiddler'>",
+	importLabel: "импорт",
+	importPrompt: "Импорт выбранных записей",
+	confirmOverwriteText: "Вы уверены, что хотите перезаписать следующие записи:\n\n%0",
+	step4Title: "Шаг 4: Ипорт %0 ",
+	step4Html: "<input type='hidden' name='markReport'></input>", // DO NOT TRANSLATE
+	doneLabel: "завершить",
+	donePrompt: "Закрыть это окно",
+	statusDoingImport: "Импорт записей...",
+	statusDoneImport: "Все записи импортированы",
+	systemServerNamePattern: "%2 on %1",
+	systemServerNamePatternNoWorkspace: "%1",
+	confirmOverwriteSaveTiddler: "Запись '%0' уже существует. Нажмите 'OK' для перезаписи, или 'Cancel' для отмены",
+	serverSaveTemplate: "|''Type:''|%0|\n|''URL:''|%1|\n|''Workspace:''|%2|\n\nЭта запись была создана автоматически для записи настроек сервера",
+	serverSaveModifier: "(System)",
+	listViewTemplate: {
+		columns: [
+			{name: 'Selected', field: 'Selected', rowName: 'title', type: 'Selector'},
+			{name: 'Tiddler', field: 'tiddler', title: "Название", type: 'Tiddler'},
+			{name: 'Size', field: 'size', tiddlerLink: 'size', title: "Размер", type: 'Size'},
+			{name: 'Tags', field: 'tags', title: "Метки", type: 'Tags'}
+			],
+		rowClasses: [
+			]}
+});
+
+merge(config.macros.sync,{
+	listViewTemplate: {
+		columns: [
+			{name: 'Selected', field: 'selected', rowName: 'title', type: 'Selector'},
+			{name: 'Tiddler', field: 'tiddler', title: "Название", type: 'Tiddler'},
+			{name: 'Server Type', field: 'serverType', title: "Тип сервера", type: 'String'},
+			{name: 'Server Host', field: 'serverHost', title: "Хост сервера", type: 'String'},
+			{name: 'Server Workspace', field: 'serverWorkspace', title: "Рабочая область сервера", type: 'String'},
+			{name: 'Status', field: 'status', title: "Статус синхр.", type: 'String'},
+			{name: 'Server URL', field: 'serverUrl', title: "URL сервера", text: "View", type: 'Link'}
+			],
+		rowClasses: [
+			],
+		buttons: [
+			{caption: "Синхронизовать эти записи", name: 'sync'}
+			]},
+	wizardTitle: "Синхронизация с внешним сервером или файлом",
+	step1Title: "Выберите записи, которые нужно синхронизовать",
+	step1Html: "<input type='hidden' name='markList'></input>", // DO NOT TRANSLATE
+	syncLabel: "синхр.",
+	syncPrompt: "Синхронизация этих записей",
+	hasChanged: "Изменены с момента отключения",
+	hasNotChanged: "Не изменены с момента отключения",
+	syncStatusList: {
+		none: {text: "...", display:null, className:'notChanged'},
+		changedServer: {text: "Changed on server", display:null, className:'changedServer'},
+		changedLocally: {text: "Changed while unplugged", display:null, className:'changedLocally'},
+		changedBoth: {text: "Changed while unplugged and on server", display:null, className:'changedBoth'},
+		notFound: {text: "Not found on server", display:null, className:'notFound'},
+		putToServer: {text: "Saved update on server", display:null, className:'putToServer'},
+		gotFromServer: {text: "Retrieved update from server", display:null, className:'gotFromServer'}
+		}
+});
+
+/*}}}*/
+
+
